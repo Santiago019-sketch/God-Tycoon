@@ -1,127 +1,358 @@
--- Create the ScreenGui
-local midnightHub = Instance.new("ScreenGui")
-midnightHub.Name = "MidnightHub"
-midnightHub.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-midnightHub.ResetOnSpawn = false -- Keep the GUI after respawn
-
--- Main frame
-local mainFrame = Instance.new("Frame")
-mainFrame.Name = "MainFrame"
-mainFrame.Parent = midnightHub
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-mainFrame.BorderSizePixel = 0
-mainFrame.Size = UDim2.new(0, 300, 0, 400)
-mainFrame.Position = UDim2.new(0.5, -150, 0.5, -200) -- Centered
-mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-
--- Title Label
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Name = "TitleLabel"
-titleLabel.Parent = mainFrame
-titleLabel.Text = "Midnight Hub"
-titleLabel.Font = Enum.Font.SourceSansBold
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-titleLabel.Size = UDim2.new(1, 0, 0, 50)
-titleLabel.TextSize = 24
-
--- Buttons Section
-local buttonTemplate = Instance.new("TextButton")
-buttonTemplate.Size = UDim2.new(0.8, 0, 0, 30)
-buttonTemplate.Position = UDim2.new(0.1, 0, 0, 60)
-buttonTemplate.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-buttonTemplate.TextColor3 = Color3.fromRGB(255, 255, 255)
-buttonTemplate.Font = Enum.Font.SourceSans
-buttonTemplate.TextSize = 18
-buttonTemplate.Text = "Button"
-buttonTemplate.Visible = false -- Template button
-
--- Function to create buttons dynamically
-local function createButton(parent, name, text, position, callback)
-    local button = buttonTemplate:Clone()
-    button.Name = name
-    button.Text = text
-    button.Position = UDim2.new(0.1, 0, 0, position)
-    button.Visible = true
-    button.Parent = parent
-
-    button.MouseButton1Click:Connect(callback)
-    return button
+-- made by Riot And Midnight Hub --
+ 
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("GT", "BloodTheme")
+local Tab1 = Window:NewTab("Misc")
+local Tab2 = Window:NewTab("Tools")
+local Tab3 = Window:NewTab("Teleports")
+local Section4 = Tab1:NewSection("Misc")
+local Section5 = Tab2:NewSection("Tools")
+local Section6 = Tab3:NewSection("Teleports")
+ 
+Section4:NewToggle("Auto Collect", "Automatically collects cash", function(state)
+    if state then
+        enabled = true
+ 
+        local tycoons = workspace.Tycoons.Tycoons
+local plrName = game.Players.LocalPlayer.Name
+ 
+for i,tycoon in pairs(tycoons:GetChildren()) do
+    if tostring(tycoon.Owner.Value) == plrName then
+        local playerTycoon = tycoons[tycoon.Name]
+ 
+        local giver = playerTycoon.Essentials.Giver
+        local currencyToCollect = playerTycoon.CurrencyToCollect
+ 
+        currencyToCollect.Changed:Connect(function()
+            if enabled == true then
+            firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, giver, 0)
+            wait(0.1)
+            firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, giver, 1)
+            end
+            end)
+    end
+    end
+        else
+            enabled = false
 end
-
--- Teleport Button
-createButton(mainFrame, "TeleportButton", "Teleport to Spawn", 60, function()
-    local player = game.Players.LocalPlayer
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        player.Character.HumanoidRootPart.CFrame = CFrame.new(0, 10, 0) -- Change to your desired teleport coordinates
+end)
+ 
+Section4:NewToggle("Laser Removal", "Removes lasers from owner only door", function(state)
+    if state then
+        local tycoons = workspace.Tycoons.Tycoons
+local plrName = game.Players.LocalPlayer.Name
+ 
+for i,tycoon in pairs(tycoons:GetChildren()) do
+    if tostring(tycoon.Owner.Value) ~= plrName then
+        if tycoon.PurchasedObjects:FindFirstChild("OwnerOnlyDoor") then
+            local owner = Instance.new("StringValue")
+            owner.Name = "Owner"
+            owner.Parent = tycoon.PurchasedObjects.OwnerOnlyDoor
+            owner.Value = tostring(tycoon.Name)
+            tycoon.PurchasedObjects:FindFirstChild("OwnerOnlyDoor").Parent = game.ReplicatedStorage
+        end
     end
+    end
+        else
+            for i,v in pairs(game.ReplicatedStorage:GetChildren()) do
+                if v.Name == "OwnerOnlyDoor" then
+                    local tycoon = game.Workspace.Tycoons.Tycoons:FindFirstChild(v.Owner.Value)
+                    v.Parent = tycoon.PurchasedObjects
+                end
+                end
+            end
+end)
+ 
+Section4:NewToggle("Auto Buy", "Automatically purchases objects you can afford", function(state)
+    if state then
+        enabled1 = true
+        local cash = game.Players.LocalPlayer.leaderstats.Cash
+ 
+cash.Changed:Connect(function()
+    local tycoons = workspace.Tycoons.Tycoons
+    local plrName = game.Players.LocalPlayer.Name
+ 
+    for i,tycoon in pairs(tycoons:GetChildren()) do
+        if tostring(tycoon.Owner.Value) == plrName then
+            local playerTycoon = tycoons[tycoon.Name]
+ 
+            print(playerTycoon)
+ 
+            local buttons = playerTycoon:FindFirstChild("Buttons")
+ 
+            for i,button in pairs(buttons:GetChildren()) do
+                if enabled1 == true then
+                    if button:FindFirstChild("Gamepass") then
+                        -- button is a gamepass, not purchasable via cash --
+                        else
+                            firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, button.Head, 0)
+                            wait(0.1)
+                            firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, button.Head, 1)
+                            end
+                    end
+                    end
+            end
+        end
+end)
+        else
+            enabled1 = false
+            end
 end)
 
--- Speed Boost Button
-createButton(mainFrame, "SpeedButton", "Speed Boost", 100, function()
-    local player = game.Players.LocalPlayer
-    if player.Character and player.Character:FindFirstChild("Humanoid") then
-        player.Character.Humanoid.WalkSpeed = 50 -- Adjust speed as needed
+Section4:NewToggle("Auto Click", "Automatically clicks button", function(state)
+    if state then
+        
+        _G.autoClick = true
+        
+        local tycoons = workspace.Tycoons.Tycoons
+        local plrName = game.Players.LocalPlayer.Name
+        
+        for i,tycoon in pairs(tycoons:GetChildren()) do
+        if tostring(tycoon.Owner.Value) == plrName then
+            local playerTycoon = tycoons[tycoon.Name]
+            
+            while _G.autoClick == true do
+                wait()
+                fireclickdetector(playerTycoon.PurchasedObjects.Mine.Model.Clicker.ClickDetector)
+                end
+        end
+        end
+        else
+            _G.autoClick = false
+        end
+    end)
+ 
+Section5:NewButton("Poison Tools", "Gives the tools of the poison tycoon", function()
+    local tycoons = workspace.Tycoons.Tycoons
+    local plrName = game.Players.LocalPlayer.Name
+ 
+    for i,tycoon in pairs(tycoons:GetChildren()) do
+        if tycoon.Name == "Poison" then
+            local poisonPurchases = tycoon.PurchasedObjects
+ 
+            if poisonPurchases:FindFirstChild("Giver1") and poisonPurchases:FindFirstChild("Giver2") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 0)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 1)
+            elseif poisonPurchases:FindFirstChild("Giver1") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 1)
+            elseif poisonPurchases:FindFirstChild("Giver2") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 1)
+                else
+                    print("Tycoon has no tools")
+            end
+        end
     end
 end)
-
--- Reset Speed Button
-createButton(mainFrame, "ResetSpeedButton", "Reset Speed", 140, function()
-    local player = game.Players.LocalPlayer
-    if player.Character and player.Character:FindFirstChild("Humanoid") then
-        player.Character.Humanoid.WalkSpeed = 16 -- Default speed
+ 
+Section5:NewButton("Nature Tools", "Gives the tools of the nature tycoon", function()
+    local tycoons = workspace.Tycoons.Tycoons
+    local plrName = game.Players.LocalPlayer.Name
+ 
+    for i,tycoon in pairs(tycoons:GetChildren()) do
+        if tycoon.Name == "Nature" then
+            local poisonPurchases = tycoon.PurchasedObjects
+ 
+            if poisonPurchases:FindFirstChild("Giver1") and poisonPurchases:FindFirstChild("Giver2") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 0)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 1)
+            elseif poisonPurchases:FindFirstChild("Giver1") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 1)
+            elseif poisonPurchases:FindFirstChild("Giver2") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 1)
+                else
+                    print("Tycoon has no tools")
+            end
+        end
     end
 end)
-
--- Noclip Button
-local noclipActive = false
-createButton(mainFrame, "NoclipButton", "Toggle Noclip", 180, function()
-    noclipActive = not noclipActive
-    local player = game.Players.LocalPlayer
-    local character = player.Character
-
-    if character then
-        for _, part in ipairs(character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = not noclipActive
+ 
+Section5:NewButton("Death Tools", "Gives the tools of the death tycoon", function()
+    local tycoons = workspace.Tycoons.Tycoons
+    local plrName = game.Players.LocalPlayer.Name
+ 
+    for i,tycoon in pairs(tycoons:GetChildren()) do
+        if tycoon.Name == "Death" then
+            local poisonPurchases = tycoon.PurchasedObjects
+ 
+            if poisonPurchases:FindFirstChild("Giver1") and poisonPurchases:FindFirstChild("Giver2") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 0)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 1)
+            elseif poisonPurchases:FindFirstChild("Giver1") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 1)
+            elseif poisonPurchases:FindFirstChild("Giver2") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 1)
+                else
+                    print("Tycoon has no tools")
+            end
+        end
+    end
+end)
+ 
+Section5:NewButton("Lightning Tools", "Gives the tools of the lightning tycoon", function()
+    local tycoons = workspace.Tycoons.Tycoons
+    local plrName = game.Players.LocalPlayer.Name
+ 
+    for i,tycoon in pairs(tycoons:GetChildren()) do
+        if tycoon.Name == "Lightning" then
+            local poisonPurchases = tycoon.PurchasedObjects
+ 
+            if poisonPurchases:FindFirstChild("Giver1") and poisonPurchases:FindFirstChild("Giver2") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 0)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 1)
+            elseif poisonPurchases:FindFirstChild("Giver1") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 1)
+            elseif poisonPurchases:FindFirstChild("Giver2") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 1)
+                else
+                    print("Tycoon has no tools")
+            end
+        end
+    end
+end)
+ 
+Section5:NewButton("Ice Tools", "Gives the tools of the death tycoon", function()
+    local tycoons = workspace.Tycoons.Tycoons
+    local plrName = game.Players.LocalPlayer.Name
+ 
+    for i,tycoon in pairs(tycoons:GetChildren()) do
+        if tycoon.Name == "Ice" then
+            local poisonPurchases = tycoon.PurchasedObjects
+ 
+            if poisonPurchases:FindFirstChild("Giver1") and poisonPurchases:FindFirstChild("Giver2") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 0)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 1)
+            elseif poisonPurchases:FindFirstChild("Giver1") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 1)
+            elseif poisonPurchases:FindFirstChild("Giver2") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 1)
+                else
+                    print("Tycoon has no tools")
+            end
+        end
+    end
+end)
+ 
+Section5:NewButton("Wind Tools", "Gives the tools of the wind tycoon", function()
+    local tycoons = workspace.Tycoons.Tycoons
+    local plrName = game.Players.LocalPlayer.Name
+ 
+    for i,tycoon in pairs(tycoons:GetChildren()) do
+        if tycoon.Name == "Wind" then
+            local poisonPurchases = tycoon.PurchasedObjects
+ 
+            if poisonPurchases:FindFirstChild("Giver1") and poisonPurchases:FindFirstChild("Giver2") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 0)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 1)
+            elseif poisonPurchases:FindFirstChild("Giver1") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 1)
+            elseif poisonPurchases:FindFirstChild("Giver2") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 1)
+                else
+                    print("Tycoon has no tools")
+            end
+        end
+    end
+end)
+ 
+Section5:NewButton("Fire Tools", "Gives the tools of the fire tycoon", function()
+    local tycoons = workspace.Tycoons.Tycoons
+    local plrName = game.Players.LocalPlayer.Name
+ 
+    for i,tycoon in pairs(tycoons:GetChildren()) do
+        if tycoon.Name == "Fire" then
+            local poisonPurchases = tycoon.PurchasedObjects
+ 
+            if poisonPurchases:FindFirstChild("Giver1") and poisonPurchases:FindFirstChild("Giver2") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 0)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 1)
+            elseif poisonPurchases:FindFirstChild("Giver1") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver1.Giver, 1)
+            elseif poisonPurchases:FindFirstChild("Giver2") then
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 0)
+                wait(0.1)
+                firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, poisonPurchases.Giver2.Giver, 1)
+                else
+                    print("Tycoon has no tools")
             end
         end
     end
 end)
 
--- Music Button
-local musicId = "rbxassetid://1234567890" -- Replace with a valid music ID
-local musicPlaying = false
-local sound = Instance.new("Sound", game.Workspace)
-sound.SoundId = musicId
-createButton(mainFrame, "MusicButton", "Play/Pause Music", 220, function()
-    if musicPlaying then
-        sound:Pause()
-    else
-        sound:Play()
-    end
-    musicPlaying = not musicPlaying
+Section6:NewButton("Ice Tycoon", "Teleports you to the ice tycoon", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(277.608276, 140.479126, -171.713165)
 end)
 
--- Credits
-local creditsLabel = Instance.new("TextLabel")
-creditsLabel.Name = "CreditsLabel"
-creditsLabel.Parent = mainFrame
-creditsLabel.Text = "Created by [YourName]"
-creditsLabel.Font = Enum.Font.SourceSans
-creditsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-creditsLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-creditsLabel.Size = UDim2.new(1, 0, 0, 30)
-creditsLabel.Position = UDim2.new(0, 0, 1, -30) -- Bottom of the frame
-creditsLabel.TextSize = 14
+Section6:NewButton("Nature Tycoon", "Teleports you to the nature tycoon", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(75.3429565, 138.334717, 35.1716614)
+end)
 
--- UI Corners (optional for rounded corners)
-local function applyUICorner(object)
-    local corner = Instance.new("UICorner")
-    corner.Parent = object
-end
+Section6:NewButton("Death Tycoon", "Teleports you to the death tycoon", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(76.4955673, 140.269302, -378.061646)
+end)
 
-applyUICorner(mainFrame)
-applyUICorner(buttonTemplate)
-applyUICorner(titleLabel)
-applyUICorner(creditsLabel)
+Section6:NewButton("Lightning Tycoon", "Teleports you to the lightning tycoon", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(215.946243, 140.478531, -312.939697)
+end)
+
+Section6:NewButton("Light Tycoon", "Teleports you to the light tycoon", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(215.563568, 140.454056, -29.9981823)
+end)
+
+Section6:NewButton("Poison Tycoon", "Teleports you to the poison tycoon", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-64.9857178, 140.372375, -315.127991)
+end)
+
+Section6:NewButton("Fire Tycoon", "Teleports you to the fire tycoon", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-126.079498, 140.422226, -174.646118)
+end)
+
+Section6:NewButton("Wind Tycoon", "Teleports you to the wind tycoon", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-68.536377, 140.464355, -30.7801437)
+    end)
