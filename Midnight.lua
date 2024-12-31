@@ -4,6 +4,46 @@ local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shl
 -- Create the main window
 local Window = OrionLib:MakeWindow({Name = "God Tycoon GUI", HidePremium = false, SaveConfig = true, ConfigFolder = "GodTycoon"})
 
+-- Helper function for teleportation
+local function teleportTo(position)
+    local player = game.Players.LocalPlayer
+    if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = position
+    end
+end
+
+-- Helper function for auto-buy
+local autoBuyEnabled = false
+local function autoBuyItems()
+    while autoBuyEnabled do
+        for _, button in pairs(workspace.TycoonObjects:GetChildren()) do
+            if button:IsA("Model") and button:FindFirstChild("Owner") and button.Owner.Value == game.Players.LocalPlayer.Name then
+                for _, item in pairs(button:GetChildren()) do
+                    if item:IsA("ClickDetector") then
+                        fireclickdetector(item)
+                    end
+                end
+            end
+        end
+        wait(1) -- Adjust delay as needed
+    end
+end
+
+-- Helper function for auto-collect
+local autoCollectEnabled = false
+local function autoCollectMoney()
+    while autoCollectEnabled do
+        for _, collector in pairs(workspace.TycoonObjects:GetChildren()) do
+            if collector:IsA("Model") and collector:FindFirstChild("Owner") and collector.Owner.Value == game.Players.LocalPlayer.Name then
+                if collector:FindFirstChild("CashCollector") and collector.CashCollector:FindFirstChild("ClickDetector") then
+                    fireclickdetector(collector.CashCollector.ClickDetector)
+                end
+            end
+        end
+        wait(1) -- Adjust delay as needed
+    end
+end
+
 -- Teleports Tab
 local TeleportTab = Window:MakeTab({
     Name = "Teleports",
@@ -11,32 +51,17 @@ local TeleportTab = Window:MakeTab({
     PremiumOnly = false
 })
 
--- Teleport Buttons
 TeleportTab:AddButton({
     Name = "Teleport to Center",
     Callback = function()
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 10, 0) -- Replace with the actual coordinates
+        teleportTo(CFrame.new(0, 10, 0)) -- Replace with actual center coordinates
     end
 })
 
 TeleportTab:AddButton({
     Name = "Teleport to Lightning Base",
     Callback = function()
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(100, 10, 0) -- Replace with the actual coordinates
-    end
-})
-
-TeleportTab:AddButton({
-    Name = "Teleport to Death Base",
-    Callback = function()
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(200, 10, 0) -- Replace with the actual coordinates
-    end
-})
-
-TeleportTab:AddButton({
-    Name = "Teleport to Poison Base",
-    Callback = function()
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(300, 10, 0) -- Replace with the actual coordinates
+        teleportTo(CFrame.new(100, 10, 0)) -- Replace with lightning base coordinates
     end
 })
 
@@ -54,87 +79,32 @@ MorphTab:AddButton({
     end
 })
 
-MorphTab:AddButton({
-    Name = "Death Morph",
-    Callback = function()
-        -- Add death morph functionality
-    end
-})
-
-MorphTab:AddButton({
-    Name = "Poison Morph",
-    Callback = function()
-        -- Add poison morph functionality
-    end
-})
-
--- Music Tab
-local MusicTab = Window:MakeTab({
-    Name = "Music",
+-- Automation Tab
+local AutomationTab = Window:MakeTab({
+    Name = "Automation",
     Icon = "rbxassetid://4483345998",
     PremiumOnly = false
 })
 
-MusicTab:AddButton({
-    Name = "Play Music 1",
-    Callback = function()
-        local sound = Instance.new("Sound", game.Players.LocalPlayer.PlayerGui)
-        sound.SoundId = "rbxassetid://12345678" -- Replace with the asset ID for Music 1
-        sound:Play()
-    end
-})
-
-MusicTab:AddButton({
-    Name = "Play Music 2",
-    Callback = function()
-        local sound = Instance.new("Sound", game.Players.LocalPlayer.PlayerGui)
-        sound.SoundId = "rbxassetid://87654321" -- Replace with the asset ID for Music 2
-        sound:Play()
-    end
-})
-
-MusicTab:AddButton({
-    Name = "Stop Music",
-    Callback = function()
-        for _, sound in pairs(game.Players.LocalPlayer.PlayerGui:GetChildren()) do
-            if sound:IsA("Sound") then
-                sound:Stop()
-                sound:Destroy()
-            end
+AutomationTab:AddToggle({
+    Name = "Auto-Buy Items",
+    Default = false,
+    Callback = function(state)
+        autoBuyEnabled = state
+        if state then
+            autoBuyItems()
         end
     end
 })
 
--- Settings Tab
-local SettingsTab = Window:MakeTab({
-    Name = "Settings",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-SettingsTab:AddTextbox({
-    Name = "Set Speed",
-    Default = "16",
-    TextDisappear = true,
-    Callback = function(value)
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = tonumber(value)
-    end
-})
-
-SettingsTab:AddButton({
-    Name = "Toggle Noclip",
-    Callback = function()
-        local noclip = false
-        game:GetService("RunService").Stepped:Connect(function()
-            if noclip then
-                for _, part in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
-                    if part:IsA("BasePart") and part.CanCollide then
-                        part.CanCollide = false
-                    end
-                end
-            end
-        end)
-        noclip = not noclip
+AutomationTab:AddToggle({
+    Name = "Auto-Collect Money",
+    Default = false,
+    Callback = function(state)
+        autoCollectEnabled = state
+        if state then
+            autoCollectMoney()
+        end
     end
 })
 
