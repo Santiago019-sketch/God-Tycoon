@@ -1,6 +1,6 @@
 -- made by Riot And Midnight Hub --
  
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 local Window = Library.CreateLib("GT", "BloodTheme")
 local Tab1 = Window:NewTab("Misc")
 local Tab2 = Window:NewTab("Tools")
